@@ -13,7 +13,7 @@ import (
 )
 
 func newService(namespace, addr string) (runtime.Object, error) {
-	host, port, err := net.SplitHostPort(addr)
+	_, port, err := net.SplitHostPort(addr)
 	if err != nil {
 		return nil, errors.Wrap(err, "Guard server address is invalid.")
 	}
@@ -29,8 +29,8 @@ func newService(namespace, addr string) (runtime.Object, error) {
 			Labels:    labels,
 		},
 		Spec: core.ServiceSpec{
-			Type:      core.ServiceTypeClusterIP,
-			ClusterIP: host,
+			Type: core.ServiceTypeClusterIP,
+			// ClusterIP: host,
 			Ports: []core.ServicePort{
 				{
 					Name:       "api",
