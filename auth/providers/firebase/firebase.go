@@ -49,10 +49,13 @@ func (g *Authenticator) Check(token string) (*authv1.UserInfo, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to authenticate user")
 	}
-
+	firebaseUser, err := g.Client.GetUser(context.Background(), t.UID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get authenticated user info")
+	}
 	user := &authv1.UserInfo{
-		Username: t.Subject,
-		UID:      t.Subject,
+		Username: firebaseUser.UserInfo.Email,
+		UID:      t.UID,
 	}
 
 	return user, nil
