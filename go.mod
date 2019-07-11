@@ -3,6 +3,7 @@ module github.com/appscode/guard
 go 1.12
 
 require (
+	firebase.google.com/go v3.8.1+incompatible
 	github.com/Azure/go-autorest v11.1.2+incompatible
 	github.com/appscode/go v0.0.0-20190603183757-54ec592fa0ba
 	github.com/appscode/pat v0.0.0-20170521084856-48ff78925b79

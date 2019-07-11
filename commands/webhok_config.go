@@ -30,7 +30,7 @@ func NewCmdGetWebhookConfig() *cobra.Command {
 			if len(args) == 0 {
 				switch org {
 				// for gitlab/azure/ldap client name not required
-				case "gitlab", "azure", "ldap":
+				case "gitlab", "azure", "ldap", "firebase":
 					args = []string{org}
 				}
 			}
