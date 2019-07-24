@@ -4,8 +4,8 @@ import (
 	"context"
 
 	firebase "firebase.google.com/go"
-	fauth "firebase.google.com/go/auth"
-	"github.com/appscode/guard/auth"
+	fbauth "firebase.google.com/go/auth"
+	auth "github.com/appscode/guard/auth"
 	"github.com/pkg/errors"
 	authv1 "k8s.io/api/authentication/v1"
 )
@@ -19,7 +19,7 @@ func init() {
 }
 
 type Authenticator struct {
-	Client *fauth.Client
+	c FirebaseAuth
 }
 
 func New(opts Options) (auth.Interface, error) {
@@ -34,7 +34,7 @@ func New(opts Options) (auth.Interface, error) {
 	}
 
 	au := &Authenticator{
-		Client: ac,
+		c: &FirebaseAuthClient{ac},
 	}
 
 	return au, nil
@@ -45,11 +45,11 @@ func (g Authenticator) UID() string {
 }
 
 func (g *Authenticator) Check(token string) (*authv1.UserInfo, error) {
-	t, err := g.Client.VerifyIDTokenAndCheckRevoked(context.Background(), token)
+	t, err := g.c.VerifyIDTokenAndCheckRevoked(context.Background(), token)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to authenticate user")
 	}
-	firebaseUser, err := g.Client.GetUser(context.Background(), t.UID)
+	firebaseUser, err := g.c.GetUser(context.Background(), t.UID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get authenticated user info")
 	}
@@ -59,4 +59,15 @@ func (g *Authenticator) Check(token string) (*authv1.UserInfo, error) {
 	}
 
 	return user, nil
+}
+
+// FirebaseAuth defines methods used by the FirebaseAuthClient
+type FirebaseAuth interface {
+	VerifyIDTokenAndCheckRevoked(context context.Context, idToken string) (*fbauth.Token, error)
+	GetUser(context context.Context, uid string) (*fbauth.UserRecord, error)
+}
+
+// FirebaseAuthClient wraps the firebase.Client
+type FirebaseAuthClient struct {
+	*fbauth.Client
 }

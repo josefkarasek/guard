@@ -81,13 +81,6 @@ func (o Options) Apply(d *v1beta1.Deployment) (extraObjs []runtime.Object, err e
 	}
 	d.Spec.Template.Spec.Volumes = append(d.Spec.Template.Spec.Volumes, vol)
 
-	// use auth secret in container[0] args
-	args := container.Args
-	if o.ServiceAccountJsonFile != "" {
-		args = append(args, "--firebase.sa-json-file=/etc/guard/auth/firebase/sa.json")
-	}
-	container.Args = args
-
 	// export GOOGLE_APPLICATION_CREDENTIALS
 	// https://cloud.google.com/docs/authentication/getting-started
 	envs := container.Env
